@@ -13,77 +13,47 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 public class Bossbar {
-    private static Integer i = 4;
+    private static Integer i = 6;
+    private static Integer currentTextIndex = 0;
     private static Integer randIntBefore = 0;
     public static ServerBossBar bar = ServerBossBar.builder()
-            .color(BossBarColors.GREEN)
+            .color(BossBarColors.BLUE)
             .name(Text.of("Evil Boss Bar rawr!"))
-            .overlay(BossBarOverlays.PROGRESS)
+            .overlay(BossBarOverlays.NOTCHED_6)
             .percent(0.75f)
             .build();
 
 
-    private static List<String> textPool = new ArrayList<>(Arrays.asList("Heute schon gevoted? /vote", "Komm auf unseren Discord! /discord", "Diskutiere mit anderen! /forum", "Mache dich mit den Regeln vertraut! /rules", "Gehe in einen Chat-Channel: /channel"));
+    private static List<String> textPool = new ArrayList<>(Arrays.asList("§2Heute schon gevoted? /vote", "§9Komm auf unseren Discord! /discord", "§eDiskutiere mit anderen! /forum", "§cMache dich mit den Regeln vertraut! /rules", "§7Gehe in einen Chat-Channel: /channel"));
 
 
     public static void bossbarSchedule() {
 
-        Random rand = new Random();
-
         Task.Builder taskBuilder = Task.builder();
         taskBuilder.execute(() -> {
 
-            Integer randInt;
-
-            //Prevent choosing the same text as before
-            while (true) {
-                randInt = rand.nextInt(textPool.size());
-                if(randInt != randIntBefore) {
-                    randIntBefore = randInt;
-                    break;
-                }
-            }
-
-
-            bar.setPercent(i * 0.25f);
+            bar.setPercent(i * 0.1666666666666667f);
             if(i == 0) {
-                i = 4;
-            } else if(i == 4) {
-                bar.setName(Text.of(textPool.get(randInt)));
-                bar.setColor(chooseRandomBossBarColor(rand));
+                i = 6;
+            } else if(i == 6) {
+                bar.setName(Text.of(textPool.get(currentTextIndex)));
+                currentTextIndex++;
                 i--;
             } else {
                 i--;
             }
 
 
-        }).interval(1, TimeUnit.SECONDS).submit(Sponge.getPluginManager().getPlugin("modhelper").get().getInstance().get());
+            // Resetting the text index after it exceeds the size of the TextPool
+            if(currentTextIndex == textPool.size() - 1) {
+                currentTextIndex = 0;
+            }
+
+
+        }).interval(2, TimeUnit.SECONDS).submit(Sponge.getPluginManager().getPlugin("modhelper").get().getInstance().get());
     }
 
 
-    public static BossBarColor chooseRandomBossBarColor(Random rand) {
-        int randInt = rand.nextInt(6);
-
-
-        switch (randInt) {
-            case 0:
-                return BossBarColors.BLUE;
-            case 1:
-                return BossBarColors.GREEN;
-            case 2:
-                return BossBarColors.PINK;
-            case 3:
-                return BossBarColors.PURPLE;
-            case 4:
-                return BossBarColors.RED;
-            case 5:
-                return BossBarColors.WHITE;
-            case 6:
-                return BossBarColors.YELLOW;
-        }
-
-        return null;
-    }
 
 
 }
